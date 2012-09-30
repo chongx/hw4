@@ -56,8 +56,8 @@ body {
   background-color: #40744b;
   border: 1px solid #DDD;
   box-shadow: -4px 4px 7px #DDD, 4px 4px 7px #DDD;
-  -moz-transition: all 0.5s;
-  -webkit-transition: all 0.5s;
+  -moz-transition: all 0.3s;
+  -webkit-transition: all 0.3s;
 }
 
 .pane:hover {
@@ -78,11 +78,21 @@ body {
   bottom: 42%;
 }
 
+.pane.offleft {
+  left: -110%;
+  right: 110%;
+}
+
 .pane.right {
   top: 42%;
   left: 82%;
   right: 2%;
   bottom: 42%;
+}
+
+.pane.offright {
+  left: 110%;
+  right: -110%;
 }
 
 .pane.preview {
@@ -91,6 +101,11 @@ body {
   right: 0%;
   bottom: 0%;
   z-index: 1000;
+  box-shadow: 0px 0px 0px #AAA, 0px 0px 0px #AAA;
+}
+
+.pane.preview:hover {
+  box-shadow: 0px 0px 0px #AAA, 0px 0px 0px #AAA;
 }
 
 .pane.new {
@@ -110,6 +125,7 @@ body {
   width: 33px;
   opacity: 0.2;
   -webkit-transition: opacity 0.5s;
+  z-index: 2000;
 }
 
 .nav:hover {
@@ -130,4 +146,8 @@ body {
   right: 0px;
   background: url('../images/right.png') 50% 50%;
   background-repeat: no-repeat;
+}
+
+.hidden {
+  display: none;
 }
