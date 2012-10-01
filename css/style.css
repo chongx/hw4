@@ -151,3 +151,20 @@ body {
 .hidden {
   display: none;
 }
+
+.rectangle {
+  position: absolute;
+  height: 5%;
+  width: 5%;
+  background-color: #FFF;
+}
+
+#elem-settings {
+  background-color: #333;
+  color: #CCC;
+  padding: 10px;
+  position: absolute;
+  right: -100%;
+  top: 0px;
+  display: none;
+}
