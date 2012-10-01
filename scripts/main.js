@@ -1,6 +1,6 @@
 var tools = {
-  NONE: 0,
-  RECTANGLE : 1
+  NONE: 'tool0',
+  RECTANGLE : 'tool1'
 };
 var user = {
   nextId: 0,
@@ -10,7 +10,7 @@ var user = {
     return id;
   },
   currentElem: null,
-  currentTool: tools.RECTANGLE,
+  currentTool: tools.NONE,
   setCurrentElem: function(id) {
     user.currentElem = id;
     var settings = $('#elem-settings');
@@ -22,6 +22,20 @@ var user = {
       $('#' + id).append(settings);
       settings.show();
     }
+  },
+  setCurrentTool: function(tool) {
+    if(user.currentTool != tools.NONE) {
+      $('#' + user.currentTool).removeClass('selected');
+    }
+    if(tool == tools.NONE) {
+      user.currentTool = tool;
+      return;
+    }
+    if(tool != user.currentTool) {
+      $('#' + tool).addClass('selected');
+      user.currentTool = tool;
+      return;
+    }
   }
 };
 
@@ -30,6 +44,9 @@ var collection = new PaneCollection();
 
 $(function() {
   collection.panes[0].startHandlers();
+  $('.tool').on('click', function(e) {
+    user.setCurrentTool($(e.target).attr('id'));
+  });
 });
 function PaneCollection() {
   this.current = 0;
@@ -138,7 +155,7 @@ Pane.prototype.clickHandler = function(e) {
           target = target.parentNode;
         }
         e.data.addElement(user.currentTool, offsetX, offsetY);
-        user.currentTool = tools.NONE;
+        user.setCurrentTool(tools.NONE);
       } else {
         var target = e.target;
         while(!$(target).hasClass('pane')) {
@@ -198,6 +215,8 @@ function togglePreview() {
     collection.preview = false;
     $('.nav').addClass('hidden');
   } else {
+    user.setCurrentElem(null);
+    user.setCurrentTool(tools.NONE);
     $('#preview').children()[0].innerHTML = "Close";
     $('div.center').addClass('preview');
     collection.preview = true;
