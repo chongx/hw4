@@ -3,6 +3,14 @@ body {
   background-color: #EEE;
 }
 
+input {
+  padding: 5px;
+}
+
+#pane_window {
+  display: none;
+}
+
 #header {
   position: fixed;
   top: 0px;
@@ -32,6 +40,14 @@ body {
   text-align: center;
 }
 
+#options_window {
+  position: fixed;
+  top: 40%;
+  left: 0px;
+  width: 100%;
+  text-align: center;
+}
+
 #pane_list {
   position: fixed;
   bottom: 0px;
@@ -44,7 +60,7 @@ body {
 }
 
 #preview {
-  z-index: 5;
+  z-index: 2000;
   height: 18px;
   position: fixed;
   top: 14px;
@@ -58,6 +74,9 @@ body {
   box-shadow: -4px 4px 7px #DDD, 4px 4px 7px #DDD;
   -moz-transition: all 0.3s;
   -webkit-transition: all 0.3s;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .pane:hover {
@@ -95,7 +114,25 @@ body {
   right: -110%;
 }
 
-.pane.preview {
+.pane.left.preview {
+  top: 0%;
+  left: -100%;
+  bottom: 0%;
+  right: 100%;
+  z-index: 2;
+  box-shadow: 0px 0px 0px #AAA, 0px 0px 0px #AAA;
+}
+
+.pane.right.preview {
+  top: 0%;
+  left: 100%;
+  bottom: 0%;
+  right: -100%;
+  z-index: 2;
+  box-shadow: 0px 0px 0px #AAA, 0px 0px 0px #AAA;
+}
+
+.pane.center.preview {
   top: 0%;
   left: 0%;
   right: 0%;
@@ -125,7 +162,7 @@ body {
   width: 33px;
   opacity: 0.2;
   -webkit-transition: opacity 0.5s;
-  z-index: 100;
+  z-index: 1000;
 }
 
 .nav:hover {
@@ -153,12 +190,15 @@ body {
 }
 
 .elem {
-  z-index: 6;
+}
+
+.elem.current {
+  z-index: 1000;
 }
 
 .rectangle {
   position: absolute;
-  height: 5%;
+  height: 10%;
   width: 5%;
   background-color: #FFF;
 }
@@ -168,10 +208,12 @@ body {
   color: #CCC;
   padding: 10px;
   position: absolute;
-  right: -100%;
+  left: 100%;
   top: 0px;
   display: none;
-  z-index: 1000;
+  z-index: 2000;
+  margin-left: 20px;
+  opacity: 1.0;
 }
 
 .tool {
@@ -183,4 +225,31 @@ body {
 
 .tool.selected {
   background-color: #EEE;
+}
+
+.option {
+  display: inline-block;
+  padding: 20px;
+  border-radius: 10px;
+  background-color: #00B060;
+  width: 150px;
+  margin: 30px;
+  font-size: 24px;
+  -moz-transition: all 0.3s;
+  -webkit-transition: all 0.3s;
+}
+
+.option:hover {
+  background-color: #61D8A2;
+}
+
+#elem-overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0px;
+  top: 0px;
+  display: none;
+  z-index: -1;
+  box-shadow: -2px 2px 4px #999, 2px 2px 4px #999;
 }

@@ -7,24 +7,34 @@
         <script src="http://use.edgefonts.net/amaranth.js"></script>
     </head>
     <body>
-        <div id="preview"><a href="javascript: togglePreview()" class="shiny-button">Preview</a></div>
+        <div id="preview">
+            <a href="javascript: togglePreview()" class="shiny-button">Preview</a>
+        </div>
         <div id="header">
             Foliomaker
             <span id="settings">Some Misc Settings</span>
         </div>
-        <div id="pane_settings">
-          Background (color) (gradient) Tools: <span class="tool" id="tool1">Rectangle</span>
+        <div id="pane_window">
+            <div id="pane_settings">
+              Background (color) (gradient) Tools: <span class="tool" id="tool1">Rectangle</span>
+            </div>
+            <div class="pane center" id="0">
+                <div id="elem-settings">asdf</div>
+                <div id="elem-overlay"></div>
+            </div>
+            <div class="pane right new" id="new" onclick="newPane()"></div>
+            <div id="pane_list">
+                asdf
+            </div>
         </div>
-        <div class="pane center" id="0"></div>
-        <div class="pane right new" id="new" onclick="newPane()"></div>
-        <div id="pane_list">
-            asdf
+        <div id="options_window">
+          <div id="create_option" class="option">Create a new portfolio</div>
+          <div id="load_option" class="option">Load a portfolio</div>
         </div>
 
         <div id="navleft" class="nav left hidden"></div>
         <div id="navright" class="nav right hidden"></div>
-        <div id="elem-settings">asdf</div>
-        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
+        <script src="scripts/jquery.min.js"></script>
         <script src="scripts/main.js"></script>
     </body>
 </html>
