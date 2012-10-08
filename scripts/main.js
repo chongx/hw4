@@ -1,3 +1,7 @@
+/**
+ * Authors: Alexander Malyshev (amalyshe), Chong Xie (chongx)
+ */
+
 // Some functions for converting rgb to hex and back
 function hexToR(h) {return parseInt((cutHex(h)).substring(0,2),16)}
 function hexToG(h) {return parseInt((cutHex(h)).substring(2,4),16)}
@@ -13,6 +17,9 @@ function rgb2hex(rgb){
   ("0" + parseInt(rgb[2],10).toString(16)).slice(-2) +
   ("0" + parseInt(rgb[3],10).toString(16)).slice(-2);
 }
+
+var canvas = document.getElementById('tutorial_canvas');
+var ctx = canvas.getContext("2d");
 
 // List of all the tools we can use
 var tools = {
@@ -42,6 +49,8 @@ var backgrounds = {
 
 var fonts = [
   {text: 'Amaranth', font: '"Amaranth", serif'},
+  {text: 'Arial', font: 'Arial, Helvetica, sans-serif'},
+  {text: 'Palatino Linotype', font: '"Palatino Linotype", "Book Antiqua", Palatino, serif'},
   {text: 'Times New Roman', font: '"Times New Roman", Serif'}
 ];
 
@@ -226,6 +235,7 @@ function PaneCollection() {
   this.preview = false;
   this.save = false;
   this.source = false;
+  this.tutorial = false;
   this.ordering = [0];
   this.elems = [];
 }
@@ -429,6 +439,10 @@ Pane.prototype.startHandlers = function() {
 };
 
 Pane.prototype.clickHandler = function(e) {
+  if (!(e.offsetX || e.offsetY)) {
+    e.offsetX = parseInt(e.pageX) - parseInt($(e.target).position().left);
+    e.offsetY = parseInt(e.pageY) - parseInt($(e.target).position().top);
+  }
   if(!collection.preview) {
     if(collection.isPrev(e.data.id)) {
       collection.rotateRight();
@@ -437,14 +451,8 @@ Pane.prototype.clickHandler = function(e) {
     } else if(collection.isCurrent(e.data.id)) {
       if(user.currentTool != tools.NONE) {
         // CALCULATE PROPER OFFSETS
-        var offsetX = e.offsetX;
-        var offsetY = e.offsetY;
-        var target = e.target;
-        while(!$(target).hasClass('pane')) {
-          offsetX += $(target).position().left;
-          offsetY += $(target).position().top;
-          target = target.parentNode;
-        }
+        var offsetX = e.pageX - collection.getCurrent().getNode().position().left;
+        var offsetY = e.pageY - collection.getCurrent().getNode().position().top;
         var elem = e.data.addElement(user.currentTool, offsetX, offsetY);
         user.setCurrentTool(tools.NONE);
         elem.setFocus();
@@ -529,12 +537,14 @@ Pane.prototype.mousemoveHandler = function(e) {
   if(user.currentElem == null) {
     return;
   }
-  var target = e.target;
-  while(!$(target).hasClass('pane')) {
-    e.offsetX += $(target).position().left;
-    e.offsetY += $(target).position().top;
-    target = target.parentNode;
+  if (!(e.offsetX || e.offsetY)) {
+    e.offsetX = parseInt(e.pageX) - parseInt($(e.target).position().left);
+    e.offsetY = parseInt(e.pageY) - parseInt($(e.target).position().top);
   }
+  var target = collection.getCurrent().getNode();
+  e.offsetX = e.pageX - collection.getCurrent().getNode().position().left;
+  e.offsetY = e.pageY - collection.getCurrent().getNode().position().top;
+
   if(e.data.direction != null) {
     var elem = collection.elems[user.currentElem];
     var position = elem.getNode().position();
@@ -596,12 +606,11 @@ Pane.prototype.mousedownHandler = function(e) {
   if(user.currentElem == null) {
     return;
   }
-  var target = e.target;
-  while(!$(target).hasClass('pane')) {
-    e.offsetX += $(target).position().left;
-    e.offsetY += $(target).position().top;
-    target = target.parentNode;
-  }
+  var target = collection.getCurrent().getNode();
+  e.offsetX = e.pageX - collection.getCurrent().getNode().position().left;
+  e.offsetY = e.pageY - collection.getCurrent().getNode().position().top;
+  e.data.lastOffsetX = e.offsetX;
+  e.data.lastOffsetY = e.offsetY;
   var elem = collection.elems[user.currentElem];
   var position = elem.getNode().position();
   var width = elem.getNode().width();
@@ -694,9 +703,9 @@ Rectangle.prototype.copy = function(src) {
 };
 
 Rectangle.prototype.showSettings = function() {
-  var html = 'Color: <div id="rectcolor" class="colorSelector" style="background-color: ' + this.color + '"></div><br />Opacity: <input id="rectopacity" type="text" style="width: 20px;" /><br /><br />';
+  var html = 'Color: <div id="rectcolor" class="colorSelector" style="background-color: ' + this.color + '"></div><br />Opacity: <input id="rectopacity" type="text" style="width: 20px;" /><br />';
   html += '<button id="forward">Move To Front</button> <button id="back">Move To Back</button>';
-  html += '<br /><br /><button id="delete">Delete</button';
+  html += '<br /><button id="delete">Delete</button';
   $('#elem-settings').html(html);
   $('#rectopacity').val(this.getNode().css('opacity'));
   var self = this;
@@ -765,10 +774,10 @@ Text.prototype.showSettings = function() {
     html += '<option value="' + i + '">' + fonts[i].text + '</option>';
   }
   html += '</select><br />';
-  html += 'Size: <input type="text" id="textsize" value="40" style="width: 20px" />px<br />';
-  html += 'Color: <div id="textcolor" class="colorSelector" style="background-color: ' + this.color + '"></div><br /><br />';
+  html += 'Size: <input type="text" id="textsize" value="' + this.fontSize + '" style="width: 20px" />px<br />';
+  html += 'Color: <div id="textcolor" class="colorSelector" style="background-color: ' + this.color + '"></div><br />';
   html += '<button id="forward">Move To Front</button> <button id="back">Move To Back</button>';
-  html += '<br /><br /><button id="delete">Delete</button';
+  html += '<br /><button id="delete">Delete</button';
   $('#elem-settings').html(html);
   var self = this;
   $('#textcolor').ColorPicker({
@@ -834,9 +843,9 @@ Img.prototype.copy = function(src) {
 
 Img.prototype.showSettings = function() {
   var html = 'Select File: ';
-  html += '<button id="imagepicker">Pick File</button><br /><br />';
+  html += '<button id="imagepicker">Pick File</button><br />';
   html += '<button id="forward">Move To Front</button> <button id="back">Move To Back</button>';
-  html += '<br /><br /><button id="delete">Delete</button';
+  html += '<br /><button id="delete">Delete</button';
   var self = this;
   $('#elem-settings').html(html);
   $('#imagepicker').on('click', function() {
@@ -885,6 +894,79 @@ function togglePreview() {
       $('#navright').hide();
     }
   }
+}
+
+function toggleTutorial() {
+  if(collection.tutorial) {
+    $('#tutorial').children()[0].innerHTML = "Show Tutorial";
+    $('#tutorial_canvas').hide();
+    collection.tutorial = false;
+  } else {
+    $('#tutorial').children()[0].innerHTML = "Hide Tutorial";
+    collection.tutorial = true;
+    $('#tutorial_canvas').show();
+    user.setCurrentElem(null);
+    user.setCurrentTool(tools.NONE);
+    //start tut
+    ctx.textAlign = "center";
+    writeOnCanvas("Welcome to Foliomaker", 20, 400, 300);
+    setTimeout(tutorialPhase2, 2000);
+  }
+}
+
+function writeOnCanvas(text, font, x, y) {
+  ctx.font = font + "px Amaranth";
+  var width = ctx.measureText(text).width;
+  ctx.fillStyle = "#1568B0";
+  ctx.fillRect(x-width/2 - 10, y - font - 5, width + 20, font + 15);
+  ctx.fillStyle = "white";
+  ctx.fillText(text, x, y);
+}
+
+function tutorialPhase1() {
+  ctx.clearRect(0, 0, 800, 600);
+  writeOnCanvas("Click on these buttons when you're done designing your portfolio", 12, 630, 54);
+  setTimeout(tutorialPhase11, 4000);
+}
+
+function tutorialPhase11() {
+  ctx.clearRect(0, 0, 800, 600);
+  writeOnCanvas("Show Source will give you the source code of your completed", 12, 630, 54);
+  writeOnCanvas("portfolio, place the code into the specified files and you're done", 12, 630, 74);
+  setTimeout(tutorialPhase12, 5000);
+}
+
+function tutorialPhase12() {
+  ctx.clearRect(0, 0, 800, 600);
+  writeOnCanvas("Save will give you a bunch of code. Keep it safe, so you can", 12, 630, 54);
+  writeOnCanvas("come back later and load up your work and resume working on it", 12, 630, 74);
+  setTimeout(toggleTutorial, 5000);
+}
+
+function tutorialPhase2() {
+  ctx.clearRect(0, 0, 800, 600);
+  writeOnCanvas("Click on any of these tools and then click on the pane", 12, 400, 100);
+  writeOnCanvas("to add it to the pane (do not click and drag)", 12, 400, 120);
+  setTimeout(tutorialPhase3, 5000);
+}
+
+function tutorialPhase3() {
+  ctx.clearRect(0, 0, 800, 600);
+  writeOnCanvas("Click on an element to select it. Once selected, you will be given options to modify it", 12, 400, 100);
+  writeOnCanvas("You will then be able to click and drag the edges of the added component to resize it", 12, 400, 120);
+  setTimeout(tutorialPhase4, 5000);
+}
+
+function tutorialPhase4() {
+  ctx.clearRect(0, 0, 800, 600);
+  writeOnCanvas("Click on Delete Pane if you want to get rid of the current pane (only works if there is more than 1)", 12, 400, 100);
+  setTimeout(tutorialPhase5, 3000);
+}
+
+function tutorialPhase5() {
+  ctx.clearRect(0, 0, 800, 600);
+  writeOnCanvas("Click here to add more panes", 12, 700, 300);
+  setTimeout(tutorialPhase1, 3000);
 }
 
 function newPane() {
@@ -994,14 +1076,6 @@ function showSource() {
       '.hidden {\n' +
         'display: none;\n' +
       '}\n';
-/*
-      #leftarrow {
-
-      }
-
-      #rightarrow {
-
-      }*/
     for(var i in collection.ordering) {
       var pane = collection.panes[collection.ordering[i]];
       css += '#p' + pane.id + ' {\n';
@@ -1109,7 +1183,6 @@ function showSource() {
           break;
       }
     }
-    console.log(panehtml);
 
     for(var i in collection.ordering) {
       html += panehtml[collection.panes[collection.ordering[i]].id];
@@ -1126,4 +1199,8 @@ function showSource() {
     html += "</body>\n</html>";
     $('#sourcehtml').val(html);
   }
+}
+
+function showTutorial() {
+  
 }
