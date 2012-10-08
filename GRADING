@@ -1,0 +1,22 @@
+Authors: Alexander Malyshev (amalyshe), Chong Xie (chongx)
+
+Javascript (including creating your own objects with inheritance)
+  Clearly achieved this, inheritance is only used in the elements (there is a base element, which mostly handles moving and resizing the element). See the declaration of Elem, as well as Rectangle, Text, and Img.
+
+Canvas (somehow this must be included meaningfully)
+  The tutorial is done using a canvas. Self-explanatory.
+
+HTML (including a reasonably wide range of techniques, such as tables, forms with form validation, etc)
+  A table is used to display the generated code in Show Source.
+
+CSS (including a reasonably range of techniques, such as reset, pseudo-selectors, fixed and fluid layout, transitions and animations, etc)
+  So much css...
+
+DOM manipulation
+  All the manipulation! Everything needs to be manipulated!
+
+AJAX and/or JSON-P client
+  Well we export and import JSON, hopefully that counts. We also use an external API (filepicker.io) to load images.
+
+jQuery
+  Everywhere. Literally.

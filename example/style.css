@@ -1,0 +1,141 @@
+@import url(http://fonts.googleapis.com/css?family=Amaranth);
+.pane {
+  position: fixed;
+  -moz-transition: all 0.7s;
+  -webkit-transition: all 0.7s;
+}
+
+.pane.center {
+  top: 0%;
+  left: 0%;
+  bottom: 0%;
+  right: 0%;
+  z-index: 2;
+}
+
+.pane.left {
+  top: 0%;
+  left: -100%;
+  bottom: 0%;
+  right: 100%;
+  z-index: 2;
+}
+
+.pane.right {
+  top: 0%;
+  left: 100%;
+  bottom: 0%;
+  right: -100%;
+  z-index: 2;
+}
+
+.elem {
+  overflow: hidden;
+  position: absolute;
+  background-size: cover;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.nav {
+  position: fixed;
+  background-color: #FFF;
+  top: 0px;
+  bottom: 0px;
+  width: 50px;
+  opacity: 0.5;
+  z-index: 1000;
+}
+
+.nav:hover {
+  opacity: 0.6;
+  cursor: pointer;
+}
+
+.nav:active {
+  opacity: 0.8;
+}
+.nav.left {
+  left: 0px;
+}
+.nav.right {
+  right: 0px;
+}
+.hidden {
+  display: none;
+}
+#p0 {
+  background-color: #3c8040;
+}
+#p6 {
+  background-color: #3c8040;
+}
+#p24 {
+  background-image: -webkit-linear-gradient(top, rgb(26, 135, 20), rgb(18, 41, 5));
+  background-image: -moz-linear-gradient(top, rgb(26, 135, 20), rgb(18, 41, 5));
+}
+#p4 {
+  width: 58.39909808342728%;
+  height: 100.49382716049382%;
+  top: 0%;
+  left: 0%;
+  z-index: 1;
+  background-image: url("https://www.filepicker.io/api/file/q6YNGxiPTlG_8WtfutWD?dl=false");
+}
+#p5 {
+  width: 19.616685456595263%;
+  height: 52.8395061728395%;
+  top: 32.39505720727237%;
+  left: 64.46260712461246%;
+  z-index: 1;
+  color: #ffffff;
+  font-size: 70px;
+  font-family: "Amaranth", serif;
+}
+#p7 {
+  width: 99.88726042841037%;
+  height: 99.75308641975309%;
+  top: 0%;
+  left: 0%;
+  z-index: -1;
+  background-image: url("https://www.filepicker.io/api/file/wuv8LLnjRWyruEmWl7rz?dl=false");
+}
+#p8 {
+  width: 28.97406989853439%;
+  height: 20.246913580246915%;
+  top: 23.855967580536266%;
+  left: 11.572628318905686%;
+  z-index: 1;
+  color: #ffffff;
+  font-size: 40px;
+  font-family: "Amaranth", serif;
+}
+#p9 {
+  width: 28.56821019324267%;
+  height: 11.851851851851853%;
+  top: 21.48148148148148%;
+  left: 8.509959120895575%;
+  z-index: 0;
+  background-color: #ffffff;
+  opacity: 0.5;
+}
+#p25 {
+  width: 50.06002400960384%;
+  height: 75.0823070384838%;
+  top: 7.436214494116513%;
+  left: 26.338534681450703%;
+  z-index: 1;
+  background-image: url("https://www.filepicker.io/api/file/d0yCrp0LQPGVZ-395iWG?dl=false");
+}
+#p26 {
+  width: 49.459783913565424%;
+  height: 8.946503062307098%;
+  top: 85.83127622251158%;
+  left: 30.18007129609656%;
+  z-index: 1;
+  color: #ffffff;
+  font-size: 40px;
+  font-family: "Amaranth", serif;
+}
+
