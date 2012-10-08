@@ -11,6 +11,30 @@ input {
   display: none;
 }
 
+.colorSelector {
+  width: 20px;
+  height: 20px;
+  vertical-align: middle;
+  display: inline-block;
+  border: 2px solid #000;
+  border-radius: 3px;
+  margin-left: 5px;
+}
+
+#pane_bgcolor {
+  background-color: #3c8040;
+  margin-right: 10px;
+}
+
+#pane_bggradient1 {
+  background-color: #eeeeee;
+}
+
+#pane_bggradient2 {
+  background-color: #999999;
+  margin-right: 10px;
+}
+
 #header {
   position: fixed;
   top: 0px;
@@ -48,6 +72,16 @@ input {
   text-align: center;
 }
 
+#load_box {
+  width: 300px;
+  height: 200px;
+  display: none;
+}
+
+#load_submit {
+  display: none;
+}
+
 #pane_list {
   position: fixed;
   bottom: 0px;
@@ -67,9 +101,25 @@ input {
   right: 10px;
 }
 
+#save {
+  z-index: 2000;
+  height: 18px;
+  position: fixed;
+  top: 14px;
+  right: 100px;
+}
+
+#source {
+  z-index: 2000;
+  height: 18px;
+  position: fixed;
+  top: 14px;
+  right: 170px;
+}
+
 .pane {
   position: fixed;
-  background-color: #40744b;
+  background-color: #3c8040;
   border: 1px solid #DDD;
   box-shadow: -4px 4px 7px #DDD, 4px 4px 7px #DDD;
   -moz-transition: all 0.3s;
@@ -77,6 +127,7 @@ input {
   -moz-user-select: none;
   -webkit-user-select: none;
   user-select: none;
+  z-index: 6;
 }
 
 .pane:hover {
@@ -88,6 +139,7 @@ input {
   bottom: 20%;
   left: 20%;
   right: 20%;
+  z-index: 1000;
 }
 
 .pane.left {
@@ -159,18 +211,19 @@ input {
   position: absolute;
   top: 0px;
   bottom: 0px;
-  width: 33px;
-  opacity: 0.2;
-  -webkit-transition: opacity 0.5s;
+  width: 50px;
+  opacity: 0.5;
+  -webkit-transition: opacity 0.3s;
+  -moz-transition: opacity 0.3s;
   z-index: 1000;
 }
 
 .nav:hover {
-  opacity: 0.4;
+  opacity: 0.8;
 }
 
 .nav:active {
-  opacity: 0.6;
+  opacity: 1.0;
 }
 
 .nav.left {
@@ -179,10 +232,30 @@ input {
   background-repeat: no-repeat;
 }
 
+.nav.left .bg {
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  background-color: #FFF;
+  opacity: 0.5;
+}
+
 .nav.right {
   right: 0px;
   background: url('../images/right.png') 50% 50%;
   background-repeat: no-repeat;
+}
+
+.nav.right .bg{
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  background-color: #FFF;
+  opacity: 0.5;
 }
 
 .hidden {
@@ -190,10 +263,8 @@ input {
 }
 
 .elem {
-}
-
-.elem.current {
-  z-index: 1000;
+  overflow: hidden;
+  z-index: 1;
 }
 
 .rectangle {
@@ -201,6 +272,25 @@ input {
   height: 10%;
   width: 5%;
   background-color: #FFF;
+}
+
+.text {
+  position: absolute;
+  height: 20%;
+  width: 10%;
+  font-size: 24px;
+}
+
+.image {
+  position: absolute;
+  height: 50%;
+  width: 50%;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+
+.preview .innertext {
+  font-size: 167%;
 }
 
 #elem-settings {
@@ -212,8 +302,18 @@ input {
   top: 0px;
   display: none;
   z-index: 2000;
-  margin-left: 20px;
+  margin-left: 0px;
   opacity: 1.0;
+  width: 200px;
+}
+
+#elem-settings textarea {
+  width: 180px;
+  height: 120px;
+}
+
+#elem-settings input {
+  width: 100px;
 }
 
 .tool {
@@ -251,5 +351,32 @@ input {
   top: 0px;
   display: none;
   z-index: -1;
-  box-shadow: -2px 2px 4px #999, 2px 2px 4px #999;
+  border: 2px solid #000;
+}
+
+#pane_bggradient1,
+#pane_bggradient2 {
+  display: none;
+}
+
+.topbar-button {
+  display: none;
+}
+
+.topbar-dropdown {
+  position: absolute;
+  top: 200%;
+  width: 300px;
+  right: 0px;
+  background-color: #EEE;
+  height: 200px;
+  display: none;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #999;
+}
+
+#savetext {
+  width: 280px;
+  height: 150px;
 }

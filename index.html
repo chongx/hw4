@@ -2,24 +2,44 @@
 <html>
     <head>
         <title>Foliomaker</title>
+        <link rel="stylesheet" href="css/reset.css">
         <link rel="stylesheet" href="css/button.css">
         <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" media="screen" type="text/css" href="css/colorpicker.css" />
         <script src="http://use.edgefonts.net/amaranth.js"></script>
+        <script src="https://api.filepicker.io/v0/filepicker.js"></script>
     </head>
     <body>
-        <div id="preview">
+        <div id="source" class="topbar-button">
+            <a href="javascript: showSource()" class="shiny-button">Show Source</a>
+        </div>
+        <div id="save" class="topbar-button">
+            <a href="javascript: showSave()" class="shiny-button">Save</a>
+            <div class="topbar-dropdown">Copy and save everything inside the box<br /><br /><textarea id="savetext"></textarea></div>
+        </div>
+        <div id="preview" class="topbar-button">
             <a href="javascript: togglePreview()" class="shiny-button">Preview</a>
         </div>
         <div id="header">
             Foliomaker
-            <span id="settings">Some Misc Settings</span>
         </div>
         <div id="pane_window">
             <div id="pane_settings">
-              Background (color) (gradient) Tools: <span class="tool" id="tool1">Rectangle</span>
+                Background:
+                <select id="pane_bg">
+                    <option value="0" selected>Color</option>
+                    <option value="1">Gradient</option>
+                </select>
+                <div id="pane_bgcolor" class="colorSelector"></div>
+                <div id="pane_bggradient1" class="colorSelector"></div>
+                <div id="pane_bggradient2" class="colorSelector"></div>
+                Tools:
+                <span class="tool" id="tool1">Rectangle</span>
+                <span class="tool" id="tool2">Text</span>
+                <span class="tool" id="tool3">Image</span>
             </div>
             <div class="pane center" id="0">
-                <div id="elem-settings">asdf</div>
+                <div id="elem-settings"></div>
                 <div id="elem-overlay"></div>
             </div>
             <div class="pane right new" id="new" onclick="newPane()"></div>
@@ -28,13 +48,22 @@
             </div>
         </div>
         <div id="options_window">
-          <div id="create_option" class="option">Create a new portfolio</div>
-          <div id="load_option" class="option">Load a portfolio</div>
+            <div id="create_option" class="option">Create a new portfolio</div>
+            <div id="load_option" class="option">Load a portfolio</div>
+            <br />
+            <textarea id="load_box"></textarea>
+            <br />
+            <button id="load_submit">Load</button>
         </div>
 
-        <div id="navleft" class="nav left hidden"></div>
-        <div id="navright" class="nav right hidden"></div>
+        <div id="navleft" class="nav left hidden">
+            <div class="bg"></div>
+        </div>
+        <div id="navright" class="nav right hidden">
+            <div class="bg"></div>
+        </div>
         <script src="scripts/jquery.min.js"></script>
         <script src="scripts/main.js"></script>
+        <script src="scripts/colorpicker.js"></script>
     </body>
 </html>
