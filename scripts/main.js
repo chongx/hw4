@@ -41,14 +41,13 @@ var backgrounds = {
 };
 
 var fonts = [
-  {text: 'Amaranth', font: 'amaranth, serif'},
+  {text: 'Amaranth', font: '"Amaranth", serif'},
   {text: 'Times New Roman', font: '"Times New Roman", Serif'}
 ];
 
 var user = {
   nextId: 0,
   genId: function() {
-    console.log(user.nextId);
     var id = user.nextId;
     user.nextId++;
     return id;
@@ -65,9 +64,7 @@ var user = {
     user.currentElem = id;
     $('#elem-settings :input').off('change');
     var settings = $('#elem-settings');
-    var overlay = $('#elem-overlay');
     if(id == null) {
-      overlay.hide();
       settings.hide();
       return;
     } else {
@@ -75,7 +72,6 @@ var user = {
       user.updateElemSettings();
       elem.getNode().addClass('selected');
       settings.show();
-      overlay.show();
       elem.showSettings();
     }
   },
@@ -96,15 +92,10 @@ var user = {
     }
     var elem = collection.elems[user.currentElem];
     var settings = $('#elem-settings');
-    var overlay = $('#elem-overlay');
     var settingsLeft = elem.getNode().position().left + elem.getNode().width() + 20;
     var settingsTop = elem.getNode().position().top;
     settings.css('left', settingsLeft + 'px');
     settings.css('top', settingsTop + 'px');
-    overlay.css('left', (elem.getNode().position().left - 2) + 'px');
-    overlay.css('top', (elem.getNode().position().top - 2) + 'px');
-    overlay.css('width', elem.getNode().width() + 'px');
-    overlay.css('height', elem.getNode().height() + 'px');
    }
 };
 
@@ -139,6 +130,9 @@ $(function() {
   $('.tool').on('click', function(e) {
     user.setCurrentTool($(e.target).attr('id'));
   });
+  $('#delete_pane').on('click', function(e) {
+    collection.deleteCurrentPane();
+  });
   $('#create_option').on('click', function(e) {
     $('#options_window').hide(500);
     $('#pane_window').show(500);
@@ -159,14 +153,35 @@ $(function() {
       collection.panes[collection.ordering[i]] = paneobj;
       var pane = collection.panes[collection.ordering[i]].genNode();
       $('#pane_window').append(pane);
+      paneobj.startHandlers();
+      if(paneobj.backgroundType === backgrounds.COLOR) {
+        paneobj.setBackground(paneobj.backgroundType, paneobj.backgroundColor);
+      } else {
+        paneobj.setBackground(paneobj.backgroundType, paneobj.backgroundGradient1, paneobj.backgroundGradient2);
+      }
     }
-/*    for(var j in collection.elems) {
-      collection.elems[j].addToPane(collection.elems[j].paneId);
-    }*/
+    for(var j in collection.elems) {
+      if(collection.elems[j] === null) {
+        continue;
+      }
+      var elemobj;
+      switch(collection.elems[j].type) {
+        case tools.RECTANGLE:
+          elemobj = new Rectangle();
+          break;
+        case tools.TEXT:
+          elemobj = new Text();
+          break;
+        case tools.IMAGE:
+          elemobj = new Img();
+          break;
+      }
+      elemobj.copy(collection.elems[j]);
+      collection.elems[j] = elemobj;
+      collection.elems[j].addToPane(collection.elems[j].pane);
+    }
     var elem_settings = $('<div id="elem-settings"></div>');
-    var elem_overlay = $('<div id="elem-overlay"></div>');
     collection.getCurrent().getNode().append(elem_settings);
-    collection.getCurrent().getNode().append(elem_overlay);
     $('#options_window').hide(500);
     $('#pane_window').show(500);
     $('.topbar-button').show();
@@ -264,14 +279,45 @@ PaneCollection.prototype.getPane = function(paneId) {
   return collection.panes[paneId];
 };
 
+PaneCollection.prototype.deleteCurrentPane = function() {
+  if(this.ordering.length === 1) {
+    return;
+  }
+  var pane = this.getCurrent();
+  var curr = this.current;
+  // rotate
+  if(curr === 0) {
+    collection.rotateLeft();
+    this.current--;
+  } else {
+    collection.rotateRight();
+  }
+  // Remove from panes
+  delete this.panes[pane.id];
+  this.ordering.splice(curr, 1);
+
+  if(curr !== 0 && collection.getNext() !== null) {
+    collection.getNext().getNode().removeClass('offright');
+  }
+
+  // delete all elems
+  for(var i in this.elems) {
+    if(this.elems[i] === null) {
+      continue;
+    }
+    if(this.elems[i].pane === pane.id) {
+      this.elems[i].deleteElem({data: this.elems[i]});
+    }
+  }
+  pane.getNode().remove();
+};
+
 PaneCollection.prototype.rotateLeft = function() {
   if(collection.getPrev() !== null) {
     collection.getPrev().getNode().addClass('offleft');
   }
   var settings = $('#elem-settings');
-  var overlay = $('#elem-overlay');
   settings.detach();
-  overlay.detach();
   collection.getCurrent().getNode().removeClass('center').addClass('left');
   collection.getNext().getNode().removeClass('right').addClass('center');
   collection.current++;
@@ -282,7 +328,6 @@ PaneCollection.prototype.rotateLeft = function() {
     $('#new').show();
   }
   collection.getCurrent().getNode().append(settings);
-  collection.getCurrent().getNode().append(overlay);
   user.setCurrentElem(null);
   $('#pane_bg').val(collection.getCurrent().backgroundType);
   $('#pane_bgcolor').css('background-color', collection.getCurrent().backgroundColor);
@@ -307,9 +352,7 @@ PaneCollection.prototype.rotateRight = function() {
     $('#new').show();
   }
   var settings = $('#elem-settings');
-  var overlay = $('#elem-overlay');
   settings.detach();
-  overlay.detach();
   collection.getCurrent().getNode().removeClass('center').addClass('right');
   collection.getPrev().getNode().removeClass('left').addClass('center');
   collection.current--;
@@ -317,7 +360,6 @@ PaneCollection.prototype.rotateRight = function() {
     collection.getPrev().getNode().removeClass('offleft');
   }
   collection.getCurrent().getNode().append(settings);
-  collection.getCurrent().getNode().append(overlay);
   user.setCurrentElem(null);
   $('#pane_bg').val(collection.getCurrent().backgroundType);
   $('#pane_bgcolor').css('background-color', collection.getCurrent().backgroundColor);
@@ -369,14 +411,11 @@ Pane.prototype.genNode = function() {
   } else if(collection.isNext(this.id)) {
     node.addClass('right');
   } else if(collection.current > collection.ordering.indexOf(this.id)) {
+    node.addClass('left');
     node.addClass('offleft');
   } else {
+    node.addClass('right');
     node.addClass('offright');
-  }
-  if(this.backgroundType === backgrounds.COLOR) {
-    this.setBackground(this.backgroundType, this.backgroundColor);
-  } else {
-    this.setBackground(this.backgroundType, this.backgroundGradient1, this.backgroundGradient2);
   }
   return node;
 };
@@ -481,8 +520,8 @@ Pane.prototype.setBackground = function(type, color1, color2) {
     this.getNode().css('background-color', this.backgroundColor);
     this.getNode().css('background-image', '');
   } else {
-    this.getNode().css('background-image', '-webkit-linear-gradient(bottom, ' + hex2rgb(this.backgroundGradient1) + ', ' + hex2rgb(this.backgroundGradient2) + ')');
-    this.getNode().css('background-image', '-moz-linear-gradient(bottom, ' + hex2rgb(this.backgroundGradient1) + ', ' + hex2rgb(this.backgroundGradient2) + ')');
+    this.getNode().css('background-image', '-webkit-linear-gradient(top, ' + hex2rgb(this.backgroundGradient1) + ', ' + hex2rgb(this.backgroundGradient2) + ')');
+    this.getNode().css('background-image', '-moz-linear-gradient(top, ' + hex2rgb(this.backgroundGradient1) + ', ' + hex2rgb(this.backgroundGradient2) + ')');
   }
 };
 
@@ -602,6 +641,8 @@ function Elem(paneId) {
   this.pane = paneId;
   this.id = user.genId();
   this.z = 1;
+  this.left = 0;
+  this.top = 0;
 }
 
 Elem.prototype.setFocus = function() {
@@ -633,10 +674,24 @@ function Rectangle(paneId) {
   this.width = 5;
   this.height = 10;
   this.color = '#ffffff';
+  this.type = tools.RECTANGLE;
+  this.opacity = 1.0;
 }
 
 Rectangle.prototype = new Elem();
 Rectangle.prototype.constructor = Rectangle;
+
+Rectangle.prototype.copy = function(src) {
+  this.pane = src.pane;
+  this.id = src.id;
+  this.z = src.z;
+  this.width = src.width;
+  this.height = src.height;
+  this.color = src.color;
+  this.left = src.left;
+  this.top = src.top;
+  this.opacity = src.opacity;
+};
 
 Rectangle.prototype.showSettings = function() {
   var html = 'Color: <div id="rectcolor" class="colorSelector" style="background-color: ' + this.color + '"></div><br />Opacity: <input id="rectopacity" type="text" style="width: 20px;" /><br /><br />';
@@ -668,6 +723,13 @@ Rectangle.prototype.updateElem = function(e) {
 Rectangle.prototype.addToPane = function(paneId) {
   var node = $('<div class="elem rectangle" id="' + this.id + '"></div>');
   collection.getPane(paneId).getNode().append(node);
+  node.css('background-color', this.color);
+  node.css('opacity', this.opacity);
+  node.css('width', this.width + '%');
+  node.css('height', this.height + '%');
+  node.css('z-index', this.z);
+  node.css('left', this.left + "%")
+      .css('top', this.top + "%");
 };
 
 function Text(paneId) {
@@ -675,12 +737,27 @@ function Text(paneId) {
   this.width = 10;
   this.height = 20;
   this.text = 'Enter your text here';
-  this.fontSize = 12;
+  this.fontSize = 40;
   this.font = 0;
   this.color = '#000000';
+  this.type = tools.TEXT;
 }
 Text.prototype = new Elem();
 Text.prototype.constructor = Text;
+
+Text.prototype.copy = function(src) {
+  this.pane = src.pane;
+  this.id = src.id;
+  this.z = src.z;
+  this.width = src.width;
+  this.height = src.height;
+  this.text = src.text;
+  this.fontSize = src.fontSize;
+  this.font = src.font;
+  this.color = src.color;
+  this.left = src.left;
+  this.top = src.top;
+}
 Text.prototype.showSettings = function() {
   var html = 'Text: <br /><textarea id="texttext">' + this.text + '</textarea><br />';
   html += 'Font: <select id="textfont">';
@@ -723,6 +800,14 @@ Text.prototype.updateElem = function(e) {
 Text.prototype.addToPane = function(paneId) {
   var node = $('<div class="elem text" id="' + this.id + '"><div class="innertext">' + this.text + '</div></div>');
   collection.getPane(paneId).getNode().append(node);
+  node.css('width', this.width + '%');
+  node.css('height', this.height + '%');
+  node.css('z-index', this.z);
+  node.css('left', this.left + "%")
+      .css('top', this.top + "%");
+  node.css('font-size', parseInt(this.fontSize * 0.6) + 'px');
+  node.css('font-family', fonts[this.font].font);
+  node.css('color', this.color);
 };
 
 function Img(paneId) {
@@ -730,14 +815,26 @@ function Img(paneId) {
   this.width = 50;
   this.height = 50;
   this.url = '';
+  this.type = tools.IMAGE;
 }
 
 Img.prototype = new Elem();
 Img.prototype.constructor = Img;
 
+Img.prototype.copy = function(src) {
+  this.pane = src.pane;
+  this.id = src.id;
+  this.z = src.z;
+  this.width = src.width;
+  this.height = src.height;
+  this.url = src.url;
+  this.left = src.left;
+  this.top = src.top;
+}
+
 Img.prototype.showSettings = function() {
   var html = 'Select File: ';
-  html += '<button id="imagepicker">Pick File</button><br /><br /><br />';
+  html += '<button id="imagepicker">Pick File</button><br /><br />';
   html += '<button id="forward">Move To Front</button> <button id="back">Move To Back</button>';
   html += '<br /><br /><button id="delete">Delete</button';
   var self = this;
@@ -754,13 +851,18 @@ Img.prototype.showSettings = function() {
 };
 
 Img.prototype.updateElem = function(e) {
-  console.log(e.data);
   e.data.getNode().css('background-image', 'url("' + e.data.url + '")');
 };
 
 Img.prototype.addToPane = function(paneId) {
   var node = $('<div class="elem image" id="' + this.id + '"></div>');
   collection.getPane(paneId).getNode().append(node);
+  node.css('width', this.width + '%');
+  node.css('height', this.height + '%');
+  node.css('z-index', this.z);
+  node.css('left', this.left + "%")
+      .css('top', this.top + "%");
+  node.css('background-image', 'url("' + this.url + '")');
 };
 
 function togglePreview() {
@@ -811,5 +913,217 @@ function showSave() {
     user.setCurrentElem(null);
     user.setCurrentTool(tools.NONE);
     $('#savetext').val(JSON.stringify({user: user, collection: collection}));
+  }
+}
+
+function showSource() {
+  if(collection.source === true) {
+    collection.source = false;
+    $('#source .topbar-dropdown').hide();
+  } else {
+    collection.source = true;
+    $('#source .topbar-dropdown').show();
+    var css =
+      '@import url(http://fonts.googleapis.com/css?family=Amaranth);\n' +
+      '.pane {\n' +
+        'position: fixed;\n' +
+        '-moz-transition: all 0.7s;\n' +
+        '-webkit-transition: all 0.7s;\n' +
+      '}\n' +
+      '\n' +
+      '.pane.center {\n' +
+        'top: 0%;\n' +
+        'left: 0%;\n' +
+        'bottom: 0%;\n' +
+        'right: 0%;\n' +
+        'z-index: 2;\n' +
+      '}\n' +
+      '\n' +
+      '.pane.left {\n' +
+        'top: 0%;\n' +
+        'left: -100%;\n' +
+        'bottom: 0%;\n' +
+        'right: 100%;\n' +
+        'z-index: 2;\n' +
+      '}\n' +
+      '\n' +
+      '.pane.right {\n' +
+        'top: 0%;\n' +
+        'left: 100%;\n' +
+        'bottom: 0%;\n' +
+        'right: -100%;\n' +
+        'z-index: 2;\n' +
+      '}\n' +
+      '\n' +
+      '.elem {\n' +
+        'overflow: hidden;\n' +
+        'position: absolute;\n' +
+        'background-size: cover;\n' +
+        '-webkit-background-size: cover;\n' +
+        '-moz-background-size: cover;\n' +
+        'background-repeat: no-repeat;\n' +
+      '}\n' +
+      '\n' +
+      '.nav {\n' +
+        'position: fixed;\n' +
+        'background-color: #FFF;\n' +
+        'top: 0px;\n' +
+        'bottom: 0px;\n' +
+        'width: 50px;\n' +
+        'opacity: 0.5;\n' +
+        'z-index: 1000;\n' +
+      '}\n' +
+      '\n' +
+      '.nav:hover {\n' +
+        'opacity: 0.6;\n' +
+        'cursor: pointer;\n' +
+      '}\n' +
+      '\n' +
+      '.nav:active {\n' +
+        'opacity: 0.8;\n' +
+      '}\n' +
+
+      '.nav.left {\n' +
+        'left: 0px;\n' +
+      '}\n' +
+
+      '.nav.right {\n' +
+        'right: 0px;\n' +
+      '}\n' +
+
+      '.hidden {\n' +
+        'display: none;\n' +
+      '}\n';
+/*
+      #leftarrow {
+
+      }
+
+      #rightarrow {
+
+      }*/
+    for(var i in collection.ordering) {
+      var pane = collection.panes[collection.ordering[i]];
+      css += '#p' + pane.id + ' {\n';
+      if(pane.backgroundType === backgrounds.COLOR) {
+        css += 'background-color: ' + pane.backgroundColor + ';\n';
+      } else {
+        css += 'background-image: -webkit-linear-gradient(top, ' + hex2rgb(pane.backgroundGradient1) + ', ' + hex2rgb(pane.backgroundGradient2) + ');\n';
+        css += 'background-image: -moz-linear-gradient(top, ' + hex2rgb(pane.backgroundGradient1) + ', ' + hex2rgb(pane.backgroundGradient2) + ');\n';
+      }
+      css += '}\n';
+    }
+    for(var j in collection.elems) {
+      var elem = collection.elems[j];
+      if(elem === null) {
+        continue;
+      }
+      css += '#p' + elem.id + ' {\n';
+      css += 'width: ' + elem.width + '%;\n';
+      css += 'height: ' + elem.height + '%;\n';
+      css += 'top: ' + elem.top + '%;\n';
+      css += 'left: ' + elem.left + '%;\n';
+      css += 'z-index: ' + elem.z + ';\n';
+      switch(elem.type) {
+        case tools.RECTANGLE:
+          css += 'background-color: ' + elem.color + ';\n';
+          css += 'opacity: ' + elem.opacity + ';\n';
+          break;
+        case tools.TEXT:
+          css += 'color: ' + elem.color + ';\n';
+          css += 'font-size: ' + elem.fontSize + 'px;\n';
+          css += 'font-family: ' + fonts[elem.font].font + ';\n';
+          break;
+        case tools.IMAGE:
+          css += 'background-image: url("' + elem.url + '");\n';
+          break;
+      }
+      css += '}\n';
+    }
+    $('#sourcecss').val(css);
+    var ordering = "[";
+    for(var i in collection.ordering) {
+      ordering += collection.ordering[i] + ',';
+    }
+    ordering = ordering.slice(0, ordering.length - 1);
+    ordering += ']';
+    var js =
+      'var current = 0;\n' +
+      'var ordering = ' + ordering + ';\n' +
+      '\n' +
+      '$(function() {\n' +
+        '$("#navleft").on("click", function(e) {\n' +
+          '$("#p" + ordering[current]).removeClass("center").addClass("right");\n' +
+          '$("#p" + ordering[current - 1]).addClass("center").removeClass("left");\n' +
+          'if(current == 1) {\n' +
+            '$("#navleft").hide();\n' +
+          '} else {\n' +
+            '$("#navleft").show();\n' +
+          '}\n' +
+          'current--;\n' +
+          '$("#navright").show();\n' +
+        '});\n' +
+        '$("#navright").on("click", function(e) {\n' +
+          '$("#p" + ordering[current]).removeClass("center").addClass("left");\n' +
+          '$("#p" + ordering[current + 1]).addClass("center").removeClass("right");\n' +
+          'if(current == ordering.length - 2) {\n' +
+            '$("#navright").hide();\n' +
+          '} else {\n' +
+            '$("#navright").show();\n' +
+          '}\n' +
+          'current++;\n' +
+          '$("#navleft").show();\n' +
+        '});\n' +
+      '});\n';
+    $('#sourcejs').val(js);
+    var html =
+      '<!DOCTYPE html>\n' +
+      '<html>\n' +
+      '<head>\n' +
+      '<link rel="stylesheet" href="style.css">\n' +
+      '</head>\n' +
+      '<body>\n';
+    var panehtml = [];
+    for(var i in collection.ordering) {
+      var pane = collection.panes[collection.ordering[i]];
+      if(i == 0) {
+        panehtml[pane.id] = '<div id="p' + pane.id + '" class="pane center">\n';
+      } else {
+        panehtml[pane.id] = '<div id="p' + pane.id + '" class="pane right">\n';
+      }
+    }
+    for(var j in collection.elems) {
+      var elem = collection.elems[j];
+      if(elem === null) {
+        continue;
+      }
+      switch(elem.type) {
+        case tools.RECTANGLE:
+          panehtml[elem.pane] += '<div id="p' + elem.id + '" class="elem"></div>\n';
+          break;
+        case tools.TEXT:
+          panehtml[elem.pane] += '<div id="p' + elem.id + '" class="elem">' + elem.text + '</div>\n';
+          break;
+        case tools.IMAGE:
+          panehtml[elem.pane] += '<div id="p' + elem.id + '" class="elem"></div>\n';
+          break;
+      }
+    }
+    console.log(panehtml);
+
+    for(var i in collection.ordering) {
+      html += panehtml[collection.panes[collection.ordering[i]].id];
+      html += '</div>\n';
+    }
+    html += '<div id="navleft" class="nav left hidden"></div>';
+    if(collection.ordering.length > 1) {
+      html += '<div id="navright" class="nav right"></div>';
+    } else {
+      html += '<div id="navright" class="nav right hidden"></div>';
+    }
+    html += '<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>\n';
+    html += '<script src="script.js"></script>\n';
+    html += "</body>\n</html>";
+    $('#sourcehtml').val(html);
   }
 }

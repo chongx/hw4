@@ -1,5 +1,7 @@
+@import url(http://fonts.googleapis.com/css?family=Amaranth);
+
 body {
-  font-family: amaranth, serif;
+  font-family: 'Amaranth', serif;
   background-color: #EEE;
 }
 
@@ -80,17 +82,6 @@ input {
 
 #load_submit {
   display: none;
-}
-
-#pane_list {
-  position: fixed;
-  bottom: 0px;
-  left: 0px;
-  width: 100%;
-  background-color: #FFF;
-  padding: 20px;
-  text-align: center;
-  top: 85%;
 }
 
 #preview {
@@ -220,6 +211,7 @@ input {
 
 .nav:hover {
   opacity: 0.8;
+  cursor: pointer;
 }
 
 .nav:active {
@@ -232,23 +224,13 @@ input {
   background-repeat: no-repeat;
 }
 
-.nav.left .bg {
-  position: absolute;
-  top: 0px;
-  bottom: 0px;
-  left: 0px;
-  right: 0px;
-  background-color: #FFF;
-  opacity: 0.5;
-}
-
 .nav.right {
   right: 0px;
   background: url('../images/right.png') 50% 50%;
   background-repeat: no-repeat;
 }
 
-.nav.right .bg{
+.nav .bg{
   position: absolute;
   top: 0px;
   bottom: 0px;
@@ -264,33 +246,47 @@ input {
 
 .elem {
   overflow: hidden;
+  position: absolute;
   z-index: 1;
 }
 
+.elem.selected {
+  border: 2px solid #000;
+  margin-left: -2px;
+  margin-top: -2px;
+}
+
 .rectangle {
-  position: absolute;
   height: 10%;
   width: 5%;
   background-color: #FFF;
 }
 
 .text {
-  position: absolute;
   height: 20%;
   width: 10%;
   font-size: 24px;
 }
 
 .image {
-  position: absolute;
   height: 50%;
   width: 50%;
-  background-size: 100% 100%;
+  background-size: cover;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
   background-repeat: no-repeat;
 }
 
 .preview .innertext {
   font-size: 167%;
+}
+
+.pane.left .innertext {
+  font-size: 27%;
+}
+
+.pane.right .innertext {
+  font-size: 27%;
 }
 
 #elem-settings {
@@ -327,6 +323,11 @@ input {
   background-color: #EEE;
 }
 
+.tool:hover {
+  background-color: #EEE;
+  cursor: pointer;
+}
+
 .option {
   display: inline-block;
   padding: 20px;
@@ -341,17 +342,7 @@ input {
 
 .option:hover {
   background-color: #61D8A2;
-}
-
-#elem-overlay {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  left: 0px;
-  top: 0px;
-  display: none;
-  z-index: -1;
-  border: 2px solid #000;
+  cursor: pointer;
 }
 
 #pane_bggradient1,
@@ -379,4 +370,34 @@ input {
 #savetext {
   width: 280px;
   height: 150px;
+}
+
+#source .topbar-dropdown {
+  width: 800px;
+  height: 250px;
+}
+
+#source td {
+  padding: 5px;
+}
+
+#source textarea {
+  width: 250px;
+  height: 200px;
+}
+
+.delete_button {
+  border-radius: 5px;
+  background-color: #AB3232;
+  color: #EEE;
+  padding: 5px;
+}
+
+#delete_pane {
+  margin-left: 20px;
+}
+
+.delete_button:hover {
+  opacity: 0.8;
+  cursor: pointer;
 }

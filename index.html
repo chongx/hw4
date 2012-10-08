@@ -6,12 +6,36 @@
         <link rel="stylesheet" href="css/button.css">
         <link rel="stylesheet" href="css/style.css">
         <link rel="stylesheet" media="screen" type="text/css" href="css/colorpicker.css" />
-        <script src="http://use.edgefonts.net/amaranth.js"></script>
         <script src="https://api.filepicker.io/v0/filepicker.js"></script>
     </head>
     <body>
         <div id="source" class="topbar-button">
             <a href="javascript: showSource()" class="shiny-button">Show Source</a>
+            <div class="topbar-dropdown">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>index.html</th>
+                            <th>script.js</th>
+                            <th>style.css</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <textarea id="sourcehtml"></textarea>
+                            </td>
+                            <td>
+                                <textarea id="sourcejs"></textarea>
+                            </td>
+                            <td>
+                                <textarea id="sourcecss"></textarea>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                Put these 3 files all in the same directory and open index.html in your browser.
+            </div>
         </div>
         <div id="save" class="topbar-button">
             <a href="javascript: showSave()" class="shiny-button">Save</a>
@@ -37,21 +61,18 @@
                 <span class="tool" id="tool1">Rectangle</span>
                 <span class="tool" id="tool2">Text</span>
                 <span class="tool" id="tool3">Image</span>
+                <span class="delete_button" id="delete_pane">Delete Pane</span>
             </div>
             <div class="pane center" id="0">
                 <div id="elem-settings"></div>
-                <div id="elem-overlay"></div>
             </div>
             <div class="pane right new" id="new" onclick="newPane()"></div>
-            <div id="pane_list">
-                asdf
-            </div>
         </div>
         <div id="options_window">
             <div id="create_option" class="option">Create a new portfolio</div>
             <div id="load_option" class="option">Load a portfolio</div>
             <br />
-            <textarea id="load_box"></textarea>
+            <textarea id="load_box">(Replace this text with your save text)</textarea>
             <br />
             <button id="load_submit">Load</button>
         </div>
